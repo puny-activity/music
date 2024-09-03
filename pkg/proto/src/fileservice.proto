@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package fileserviceproto;
+
+option go_package = "/fileserviceproto";
+
+service FileService {
+  rpc GetAllFiles (GetAllFilesRequest) returns (GetAllFilesResponse);
+}
+
+message GetAllFilesRequest {
+
+}
+
+message GetAllFilesResponse {
+  repeated Item files = 1;
+  message Item {
+    string id = 1;
+    string name = 2;
+    string contentType = 3;
+    string path = 4;
+    int64 size = 5;
+    bytes metadata = 6;
+    string md5 = 7;
+  }
+}

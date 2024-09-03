@@ -1,0 +1,55 @@
+package albumrepo
+
+import (
+	"context"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+	"github.com/puny-activity/music/internal/entity/song/album"
+	"github.com/puny-activity/music/pkg/queryer"
+	"github.com/puny-activity/music/pkg/util"
+)
+
+type createAllEntity struct {
+	ID      uuid.UUID  `db:"id"`
+	Title   string     `db:"title"`
+	CoverID *uuid.UUID `db:"cover_id"`
+}
+
+func (r *Repository) CreateAll(ctx context.Context, albums []album.Album) error {
+	return r.createAll(ctx, r.db, albums)
+}
+
+func (r *Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, albums []album.Album) error {
+	return r.createAll(ctx, tx, albums)
+}
+
+func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, albums []album.Album) error {
+	if len(albums) == 0 {
+		return nil
+	}
+
+	query := `
+INSERT INTO albums(id, title, cover_id) 
+VALUES (:id, :title, :cover_id)
+`
+
+	albumsRepo := make([]createAllEntity, len(albums))
+	for i, albumItem := range albums {
+		var coverID *uuid.UUID
+		if albumItem.Cover != nil {
+			coverID = util.ToPointer(uuid.UUID(*albumItem.Cover.ID))
+		}
+		albumsRepo[i] = createAllEntity{
+			ID:      uuid.UUID(*albumItem.ID),
+			Title:   albumItem.Title,
+			CoverID: coverID,
+		}
+	}
+
+	_, err := queryer.NamedExecContext(ctx, query, albumsRepo)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
