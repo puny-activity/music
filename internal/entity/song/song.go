@@ -33,4 +33,5 @@ type Song struct {
 	Channels     int
 	BitrateKbps  int
 	SampleRateHz int
+	MD5          string
 }

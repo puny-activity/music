@@ -3,12 +3,18 @@ module github.com/puny-activity/music
 go 1.23.0
 
 require (
+	github.com/go-chi/chi/v5 v5.1.0
+	github.com/golang-module/carbon v1.7.3
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/lib/pq v1.10.9
 	github.com/pressly/goose/v3 v3.21.1
+	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
+	google.golang.org/grpc v1.66.0
+	google.golang.org/protobuf v1.34.1
 )
 
 require (
@@ -16,7 +22,6 @@ require (
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobuffalo/packd v0.3.0 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
-	github.com/golang-module/carbon v1.7.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -45,8 +50,6 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
-	google.golang.org/grpc v1.66.0 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

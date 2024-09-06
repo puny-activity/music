@@ -15,10 +15,14 @@ func NewID(uuidID uuid.UUID) ID {
 type File struct {
 	ID   ID
 	Name string
-	MD5  string
 }
 
-type Full struct {
+type Changed struct {
+	Updated []Updated
+	Deleted []Deleted
+}
+
+type Updated struct {
 	ID          ID
 	Name        string
 	ContentType contenttype.Type
@@ -28,7 +32,11 @@ type Full struct {
 	MD5         string
 }
 
-func (e *Full) GetAudioMetadata() *AudioMetadata {
+type Deleted struct {
+	ID ID
+}
+
+func (e *Updated) GetAudioMetadata() *AudioMetadata {
 	var m AudioMetadata
 	err := json.Unmarshal(e.Metadata, &m)
 	if err != nil {
@@ -37,7 +45,7 @@ func (e *Full) GetAudioMetadata() *AudioMetadata {
 	return &m
 }
 
-func (e *Full) GetImageMetadata() *ImageMetadata {
+func (e *Updated) GetImageMetadata() *ImageMetadata {
 	var m ImageMetadata
 	err := json.Unmarshal(e.Metadata, &m)
 	if err != nil {

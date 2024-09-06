@@ -12,8 +12,8 @@ app:
 
 api:
   http:
-    host: "0.0.0.0"
-    port: 4200
+    host: "localhost"
+    port: "4200"
   grpc:
     port: 9090
   websocket:

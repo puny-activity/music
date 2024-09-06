@@ -2,13 +2,20 @@ package cover
 
 import (
 	"github.com/google/uuid"
-	"github.com/puny-activity/music/internal/entity/remotefile"
 )
 
 type ID uuid.UUID
 
 func NewID(uuidID uuid.UUID) ID {
 	return ID(uuidID)
+}
+
+func ParseID(id string) (ID, error) {
+	uuidID, err := uuid.Parse(id)
+	if err != nil {
+		return ID{}, err
+	}
+	return ID(uuidID), nil
 }
 
 func GenerateID() ID {
@@ -21,7 +28,6 @@ func (e ID) String() string {
 
 type Cover struct {
 	ID     *ID
-	Width  string
-	Height string
-	File   remotefile.File
+	Width  int
+	Height int
 }

@@ -6,13 +6,11 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/puny-activity/music/internal/entity/song/genre"
 	"github.com/puny-activity/music/pkg/queryer"
-	"github.com/puny-activity/music/pkg/util"
 )
 
 type createAllEntity struct {
-	ID      uuid.UUID  `db:"id"`
-	Name    string     `db:"name"`
-	CoverID *uuid.UUID `db:"cover_id"`
+	ID   uuid.UUID `db:"id"`
+	Name string    `db:"name"`
 }
 
 func (r *Repository) CreateAll(ctx context.Context, genres []genre.Genre) error {
@@ -29,20 +27,15 @@ func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, gen
 	}
 
 	query := `
-INSERT INTO genres(id, name, cover_id) 
-VALUES (:id, :name, :cover_id)
+INSERT INTO genres(id, name) 
+VALUES (:id, :name)
 `
 
 	genresRepo := make([]createAllEntity, len(genres))
 	for i, genreItem := range genres {
-		var coverID *uuid.UUID
-		if genreItem.Cover != nil {
-			coverID = util.ToPointer(uuid.UUID(*genreItem.Cover.ID))
-		}
 		genresRepo[i] = createAllEntity{
-			ID:      uuid.UUID(*genreItem.ID),
-			Name:    genreItem.Name,
-			CoverID: coverID,
+			ID:   uuid.UUID(*genreItem.ID),
+			Name: genreItem.Name,
 		}
 	}
 

@@ -33,7 +33,7 @@ type API struct {
 
 type HTTP struct {
 	Host string
-	Port int
+	Port string
 }
 
 type GRPC struct {

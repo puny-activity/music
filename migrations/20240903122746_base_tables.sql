@@ -7,13 +7,6 @@ CREATE TABLE users
     email    TEXT NOT NULL
 );
 
-CREATE TABLE devices
-(
-    id      UUID PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES users (id),
-    name    TEXT NOT NULL
-);
-
 CREATE TABLE file_services
 (
     id         UUID PRIMARY KEY,
@@ -24,54 +17,48 @@ CREATE TABLE file_services
 CREATE TABLE files
 (
     id              UUID PRIMARY KEY,
-    name            TEXT     NOT NULL,
-    path            TEXT     NOT NULL,
-    md5             CHAR(32) NOT NULL,
-    file_service_id UUID     NOT NULL REFERENCES file_services (id)
+    name            TEXT NOT NULL,
+    path            TEXT NOT NULL,
+    file_service_id UUID NOT NULL REFERENCES file_services (id)
 );
 CREATE INDEX idx_files_name
     ON files (name);
-CREATE INDEX idx_files_md5
-    ON files (md5);
 
 CREATE TABLE covers
 (
     id      UUID PRIMARY KEY,
     width   SMALLINT NOT NULL,
     height  SMALLINT NOT NULL,
-    file_id UUID     NOT NULL REFERENCES files (id)
+    file_id UUID     NOT NULL REFERENCES files (id) ON DELETE CASCADE
 );
 
 CREATE TABLE genres
 (
-    id       UUID PRIMARY KEY,
-    name     TEXT,
-    cover_id UUID REFERENCES covers (id)
+    id   UUID PRIMARY KEY,
+    name TEXT
 );
-INSERT INTO genres(id, name, cover_id)
-VALUES ('00000000-0000-0000-0000-000000000000', '???', NULL);
+INSERT INTO genres(id, name)
+VALUES ('00000000-0000-0000-0000-000000000000', '???');
 CREATE INDEX idx_genres_name
     ON genres (name);
 
 CREATE TABLE albums
 (
-    id       UUID PRIMARY KEY,
-    title    TEXT,
-    cover_id UUID REFERENCES covers (id)
+    id    UUID PRIMARY KEY,
+    title TEXT
 );
-INSERT INTO albums(id, title, cover_id)
-VALUES ('00000000-0000-0000-0000-000000000000', '???', NULL);
+INSERT INTO albums(id, title)
+VALUES ('00000000-0000-0000-0000-000000000000', '???');
 CREATE INDEX idx_album_title
     ON albums (title);
 
 CREATE TABLE artists
 (
-    id       UUID PRIMARY KEY,
-    name     TEXT,
-    cover_id UUID REFERENCES covers (id)
+    id   UUID PRIMARY KEY,
+    name TEXT
 );
-INSERT INTO artists(id, name, cover_id)
-VALUES ('00000000-0000-0000-0000-000000000000', '???', NULL);
+INSERT INTO artists(id, name)
+VALUES ('00000000-0000-0000-0000-000000000000', '???');
 CREATE INDEX idx_artists_name
     ON artists (name);
 
@@ -90,7 +77,8 @@ CREATE TABLE songs
     comment        TEXT,
     channels       SMALLINT NOT NULL,
     bitrate_kbps   INTEGER  NOT NULL,
-    sample_rate_hz INTEGER  NOT NULL
+    sample_rate_hz INTEGER  NOT NULL,
+    md5            CHAR(32) NOT NULL
 );
 CREATE INDEX ids_songs_title
     ON songs (title);
@@ -100,6 +88,8 @@ CREATE INDEX ids_songs_album_id
     ON songs (album_id);
 CREATE INDEX ids_songs_artist_id
     ON songs (artist_id);
+CREATE INDEX idx_songs_md5
+    ON songs (md5);
 
 CREATE TABLE playlists
 (
@@ -142,6 +132,14 @@ CREATE TABLE roommates
     PRIMARY KEY (room_id, user_id)
 );
 
+CREATE TABLE devices
+(
+    id              UUID PRIMARY KEY,
+    user_id         UUID NOT NULL REFERENCES users (id),
+    name            TEXT NOT NULL,
+    current_room_id UUID REFERENCES rooms (id)
+);
+
 CREATE TABLE queue_items
 (
     id           UUID PRIMARY KEY,
@@ -167,6 +165,8 @@ DROP TABLE scores;
 
 DROP TABLE queue_items;
 
+DROP TABLE devices;
+
 DROP TABLE roommates;
 
 DROP TABLE rooms;
@@ -191,8 +191,6 @@ DROP TABLE covers;
 DROP TABLE files;
 
 DROP TABLE file_services;
-
-DROP TABLE devices;
 
 DROP TABLE users;
 -- +goose StatementEnd

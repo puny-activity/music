@@ -7,9 +7,11 @@ import (
 	"github.com/puny-activity/music/internal/infrastructure/fileserviceclient"
 	"github.com/puny-activity/music/internal/infrastructure/repository/albumrepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/artistrepo"
+	"github.com/puny-activity/music/internal/infrastructure/repository/filerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/fileservicerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/genrerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/songrepo"
+	"github.com/puny-activity/music/internal/usecase/artistuc"
 	"github.com/puny-activity/music/internal/usecase/fileserviceuc"
 	"github.com/puny-activity/music/internal/usecase/updatesonguc"
 	"github.com/puny-activity/music/pkg/postgres"
@@ -19,6 +21,9 @@ import (
 )
 
 type App struct {
+	FileServiceUseCase           *fileserviceuc.UseCase
+	UpdateSongUseCase            *updatesonguc.UseCase
+	ArtistUseCase                *artistuc.UseCase
 	db                           *postgres.Postgres
 	fileServiceClientsController fileserviceclient.Controller
 	log                          *zerolog.Logger
@@ -37,6 +42,7 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	txManager := txmanager.New(db.DB)
 
 	fileServiceRepository := fileservicerepo.New(db.DB, txManager, log)
+	fileRepository := filerepo.New(db.DB, txManager, log)
 	genreRepository := genrerepo.New(db.DB, txManager, log)
 	albumRepository := albumrepo.New(db.DB, txManager, log)
 	artistRepository := artistrepo.New(db.DB, txManager, log)
@@ -45,32 +51,34 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	fileServiceClientsController := fileserviceclient.NewController(log)
 
 	fileServiceUseCase := fileserviceuc.New(fileServiceRepository, fileServiceClientsController, txManager, log)
-	updateSongUseCase := updatesonguc.New(fileServiceRepository, genreRepository, albumRepository, artistRepository,
+	updateSongUseCase := updatesonguc.New(fileServiceRepository, fileRepository, genreRepository, albumRepository, artistRepository,
 		songRepository, fileServiceClientsController, txManager, log)
+	artistUseCase := artistuc.New(artistRepository, txManager, log)
 
 	err = fileServiceUseCase.ReloadClients(context.Background())
 	if err != nil {
 		fmt.Println(werr.WrapSE("failed to reload clients", err))
 	}
 
-	err = updateSongUseCase.Update(context.Background())
-	if err != nil {
-		fmt.Println(werr.WrapSE("failed to update song", err))
-	}
-
 	return &App{
-		db:  db,
-		log: log,
+		FileServiceUseCase: fileServiceUseCase,
+		UpdateSongUseCase:  updateSongUseCase,
+		ArtistUseCase:      artistUseCase,
+		db:                 db,
+		log:                log,
 	}
 }
 
 func (a *App) Close() error {
 	err := a.db.Close()
 	if err != nil {
-		return werr.WrapSE("failed to close database connection", err)
+		a.log.Error().Err(err).Msg("failed to close database connection")
 	}
 
-	a.fileServiceClientsController.Reset()
+	err = a.fileServiceClientsController.Reset()
+	if err != nil {
+		a.log.Error().Err(err).Msg("failed to close file service clients")
+	}
 
 	return nil
 }
