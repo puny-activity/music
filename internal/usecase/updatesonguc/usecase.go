@@ -52,13 +52,13 @@ type fileRepository interface {
 }
 
 type genreRepository interface {
-	GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]genre.Genre, error)
-	CreateAllTx(ctx context.Context, tx *sqlx.Tx, genresToCreate []genre.Genre) error
+	GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]genre.Base, error)
+	CreateAllTx(ctx context.Context, tx *sqlx.Tx, genresToCreate []genre.Base) error
 }
 
 type albumRepository interface {
-	GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]album.Album, error)
-	CreateAllTx(ctx context.Context, tx *sqlx.Tx, albumsToCreate []album.Album) error
+	GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]album.Base, error)
+	CreateAllTx(ctx context.Context, tx *sqlx.Tx, albumsToCreate []album.Base) error
 }
 
 type artistRepository interface {

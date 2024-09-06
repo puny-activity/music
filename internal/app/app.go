@@ -11,8 +11,10 @@ import (
 	"github.com/puny-activity/music/internal/infrastructure/repository/fileservicerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/genrerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/songrepo"
+	"github.com/puny-activity/music/internal/usecase/albumuc"
 	"github.com/puny-activity/music/internal/usecase/artistuc"
 	"github.com/puny-activity/music/internal/usecase/fileserviceuc"
+	"github.com/puny-activity/music/internal/usecase/genreuc"
 	"github.com/puny-activity/music/internal/usecase/updatesonguc"
 	"github.com/puny-activity/music/pkg/postgres"
 	"github.com/puny-activity/music/pkg/txmanager"
@@ -23,6 +25,8 @@ import (
 type App struct {
 	FileServiceUseCase           *fileserviceuc.UseCase
 	UpdateSongUseCase            *updatesonguc.UseCase
+	GenreUseCase                 *genreuc.UseCase
+	AlbumUseCase                 *albumuc.UseCase
 	ArtistUseCase                *artistuc.UseCase
 	db                           *postgres.Postgres
 	fileServiceClientsController fileserviceclient.Controller
@@ -53,6 +57,8 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	fileServiceUseCase := fileserviceuc.New(fileServiceRepository, fileServiceClientsController, txManager, log)
 	updateSongUseCase := updatesonguc.New(fileServiceRepository, fileRepository, genreRepository, albumRepository, artistRepository,
 		songRepository, fileServiceClientsController, txManager, log)
+	genreUseCase := genreuc.New(genreRepository, txManager, log)
+	albumUseCase := albumuc.New(albumRepository, txManager, log)
 	artistUseCase := artistuc.New(artistRepository, txManager, log)
 
 	err = fileServiceUseCase.ReloadClients(context.Background())
@@ -63,6 +69,8 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	return &App{
 		FileServiceUseCase: fileServiceUseCase,
 		UpdateSongUseCase:  updateSongUseCase,
+		GenreUseCase:       genreUseCase,
+		AlbumUseCase:       albumUseCase,
 		ArtistUseCase:      artistUseCase,
 		db:                 db,
 		log:                log,

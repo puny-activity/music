@@ -13,15 +13,15 @@ type createAllEntity struct {
 	Name string    `db:"name"`
 }
 
-func (r *Repository) CreateAll(ctx context.Context, genres []genre.Genre) error {
+func (r *Repository) CreateAll(ctx context.Context, genres []genre.Base) error {
 	return r.createAll(ctx, r.db, genres)
 }
 
-func (r *Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, genres []genre.Genre) error {
+func (r *Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, genres []genre.Base) error {
 	return r.createAll(ctx, tx, genres)
 }
 
-func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, genres []genre.Genre) error {
+func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, genres []genre.Base) error {
 	if len(genres) == 0 {
 		return nil
 	}

@@ -13,6 +13,14 @@ func NewID(uuidID uuid.UUID) ID {
 	return ID(uuidID)
 }
 
+func ParseID(id string) (ID, error) {
+	uuidID, err := uuid.Parse(id)
+	if err != nil {
+		return ID{}, err
+	}
+	return ID(uuidID), nil
+}
+
 func GenerateID() ID {
 	return ID(uuid.New())
 }
@@ -21,8 +29,17 @@ func (e ID) String() string {
 	return uuid.UUID(e).String()
 }
 
-type Genre struct {
-	ID    *ID
-	Name  string
-	Cover *cover.Cover
+type Base struct {
+	ID   *ID
+	Name string
 }
+
+type Genre struct {
+	Base
+	SongCount int
+	CoversIDs []cover.ID
+}
+
+const (
+	PaginationName = "song_genre_name"
+)

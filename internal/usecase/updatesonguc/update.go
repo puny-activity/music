@@ -109,7 +109,7 @@ func (u *UseCase) createNewParts(ctx context.Context, tx *sqlx.Tx, updatedFiles 
 		return werr.WrapSE("failed to get saved genres", err)
 	}
 	genres := make(map[string]genre.ID)
-	genresToCreate := make([]genre.Genre, 0)
+	genresToCreate := make([]genre.Base, 0)
 	for _, genreItem := range savedGenres {
 		genres[genreItem.Name] = *genreItem.ID
 	}
@@ -119,7 +119,7 @@ func (u *UseCase) createNewParts(ctx context.Context, tx *sqlx.Tx, updatedFiles 
 		return werr.WrapSE("failed to get saved albums", err)
 	}
 	albums := make(map[string]album.ID)
-	albumsToCreate := make([]album.Album, 0)
+	albumsToCreate := make([]album.Base, 0)
 	for _, albumItem := range savedAlbums {
 		albums[albumItem.Title] = *albumItem.ID
 	}
@@ -140,7 +140,7 @@ func (u *UseCase) createNewParts(ctx context.Context, tx *sqlx.Tx, updatedFiles 
 			if audioMetadata.Genre != nil {
 				_, ok := genres[*audioMetadata.Genre]
 				if !ok {
-					newGenre := genre.Genre{
+					newGenre := genre.Base{
 						Name: *audioMetadata.Genre,
 					}
 					newGenre.ID = util.ToPointer(genre.GenerateID())
@@ -151,7 +151,7 @@ func (u *UseCase) createNewParts(ctx context.Context, tx *sqlx.Tx, updatedFiles 
 			if audioMetadata.Album != nil {
 				_, ok := albums[*audioMetadata.Album]
 				if !ok {
-					newAlbum := album.Album{
+					newAlbum := album.Base{
 						Title: *audioMetadata.Album,
 					}
 					newAlbum.ID = util.ToPointer(album.GenerateID())

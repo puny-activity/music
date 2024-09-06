@@ -31,6 +31,14 @@ func New(cfg *config.HTTP, router *chi.Mux, middleware *httpmiddleware.Middlewar
 
 func (r *Router) Setup() {
 	r.router.Group(func(router chi.Router) {
+		router.Route("/genres", func(router chi.Router) {
+			router.Get("/", r.wrapper.Wrap(r.controller.GetGenres))
+		})
+
+		router.Route("/albums", func(router chi.Router) {
+			router.Get("/", r.wrapper.Wrap(r.controller.GetAlbums))
+		})
+
 		router.Route("/artists", func(router chi.Router) {
 			router.Get("/", r.wrapper.Wrap(r.controller.GetArtists))
 		})

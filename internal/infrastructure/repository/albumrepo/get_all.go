@@ -14,15 +14,15 @@ type getAllEntity struct {
 	Title string    `db:"title"`
 }
 
-func (r *Repository) GetAll(ctx context.Context) ([]album.Album, error) {
+func (r *Repository) GetAll(ctx context.Context) ([]album.Base, error) {
 	return r.getAll(ctx, r.db)
 }
 
-func (r *Repository) GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]album.Album, error) {
+func (r *Repository) GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]album.Base, error) {
 	return r.getAll(ctx, tx)
 }
 
-func (r *Repository) getAll(ctx context.Context, queryer queryer.Queryer) ([]album.Album, error) {
+func (r *Repository) getAll(ctx context.Context, queryer queryer.Queryer) ([]album.Base, error) {
 	query := `
 SELECT a.id,
        a.title
@@ -35,9 +35,9 @@ FROM albums a
 		return nil, err
 	}
 
-	albums := make([]album.Album, len(albumsRepo))
+	albums := make([]album.Base, len(albumsRepo))
 	for i := range albumsRepo {
-		albums[i] = album.Album{
+		albums[i] = album.Base{
 			ID:    util.ToPointer(album.NewID(albumsRepo[i].ID)),
 			Title: albumsRepo[i].Title,
 		}
