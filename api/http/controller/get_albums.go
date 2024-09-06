@@ -51,6 +51,11 @@ func (c *Controller) getAlbumsV1(w http.ResponseWriter, r *http.Request) error {
 					FieldName: album.PaginationTitle,
 					SortOrder: parameterBefore.SortOrder,
 				})
+			case "song_count":
+				parametersAfter = append(parametersAfter, pagination.Parameter{
+					FieldName: album.PaginationSongCount,
+					SortOrder: parameterBefore.SortOrder,
+				})
 			default:
 				return errs.UnknownSortParameter
 			}

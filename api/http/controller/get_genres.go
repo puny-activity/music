@@ -51,6 +51,11 @@ func (c *Controller) getGenresV1(w http.ResponseWriter, r *http.Request) error {
 					FieldName: genre.PaginationName,
 					SortOrder: parameterBefore.SortOrder,
 				})
+			case "song_count":
+				parametersAfter = append(parametersAfter, pagination.Parameter{
+					FieldName: genre.PaginationSongCount,
+					SortOrder: parameterBefore.SortOrder,
+				})
 			default:
 				return errs.UnknownSortParameter
 			}

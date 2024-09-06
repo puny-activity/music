@@ -45,5 +45,6 @@ type Album struct {
 }
 
 const (
-	PaginationTitle = "song_album_title"
+	PaginationTitle     = "song_album_title"
+	PaginationSongCount = "song_album_song_count"
 )

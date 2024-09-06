@@ -45,5 +45,6 @@ type Artist struct {
 }
 
 const (
-	PaginationName = "song_artist_name"
+	PaginationName      = "song_artist_name"
+	PaginationSongCount = "song_artist_song_count"
 )

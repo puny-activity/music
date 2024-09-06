@@ -45,5 +45,6 @@ type Genre struct {
 }
 
 const (
-	PaginationName = "song_genre_name"
+	PaginationName      = "song_genre_name"
+	PaginationSongCount = "song_genre_song_count"
 )

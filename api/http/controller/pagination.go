@@ -26,7 +26,9 @@ func ExtractCursorPagination(r *http.Request) (pagination.CursorPagination, erro
 	parametersStr := r.URL.Query().Get("sort")
 	cursorStr := r.URL.Query().Get("cursor")
 	if parametersStr == "" && cursorStr == "" {
-		return pagination.CursorPagination{}, errs.SortAndCursorNotSpecified
+		return pagination.CursorPagination{
+			Limit: limit,
+		}, nil
 	} else if parametersStr != "" && cursorStr != "" {
 		return pagination.CursorPagination{}, errs.SortAndCursorSpecified
 	}

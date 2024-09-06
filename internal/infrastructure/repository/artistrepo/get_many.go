@@ -52,7 +52,8 @@ func (dto getManyDTO) ToArtist() (artist.Artist, error) {
 }
 
 const (
-	getManyPaginationName = "ra.artist_name"
+	getManyPaginationName      = "ra.artist_name"
+	getManyPaginationSongCount = "ra.song_count"
 )
 
 func getManyPgnParameterConvert(before []pagination.Parameter) ([]pagination.Parameter, error) {
@@ -60,6 +61,10 @@ func getManyPgnParameterConvert(before []pagination.Parameter) ([]pagination.Par
 		{
 			FieldName: getManyPaginationName,
 			SortOrder: pagination.ASC,
+		},
+		{
+			FieldName: getManyPaginationName,
+			SortOrder: pagination.DESC,
 		},
 	}
 	appliedPaginators := make(map[string]struct{})
@@ -70,6 +75,11 @@ func getManyPgnParameterConvert(before []pagination.Parameter) ([]pagination.Par
 		case artist.PaginationName:
 			after = append(after, pagination.Parameter{
 				FieldName: getManyPaginationName,
+				SortOrder: param.SortOrder,
+			})
+		case artist.PaginationSongCount:
+			after = append(after, pagination.Parameter{
+				FieldName: getManyPaginationSongCount,
 				SortOrder: param.SortOrder,
 			})
 		default:
@@ -100,7 +110,7 @@ func (r *Repository) getMany(ctx context.Context, queryer queryer.Queryer, pgn p
 	if pgn.Limit < 1 {
 		return nil, pagination.CursorPair{}, errs.InvalidLimitParameter
 	}
-	if pgn.Parameters != nil {
+	if pgn.Cursor == nil {
 		var err error
 		pgn.Parameters, err = getManyPgnParameterConvert(pgn.Parameters)
 		if err != nil {
@@ -186,6 +196,8 @@ func getManyIncludeParameters(cursor pagination.Cursor, parameters []pagination.
 		switch parameter.FieldName {
 		case getManyPaginationName:
 			value = targetArtist.Name
+		case getManyPaginationSongCount:
+			value = targetArtist.SongCount
 		default:
 			continue
 		}
@@ -203,6 +215,8 @@ func getManyIncludeCursor(cursor pagination.Cursor, cursor2 *pagination.Cursor, 
 		switch parameter.FieldName {
 		case getManyPaginationName:
 			value = targetArtist.Name
+		case getManyPaginationSongCount:
+			value = targetArtist.SongCount
 		default:
 			continue
 		}
