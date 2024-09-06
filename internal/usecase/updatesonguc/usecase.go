@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/puny-activity/music/internal/entity/remotefile"
 	"github.com/puny-activity/music/internal/entity/remotefile/fileservice"
+	"github.com/puny-activity/music/internal/entity/song"
 	"github.com/puny-activity/music/internal/entity/song/album"
 	"github.com/puny-activity/music/internal/entity/song/artist"
 	"github.com/puny-activity/music/internal/entity/song/genre"
@@ -47,8 +48,8 @@ type fileServiceRepository interface {
 }
 
 type fileRepository interface {
-	DeleteTx(ctx context.Context, tx *sqlx.Tx, fileID remotefile.ID) error
-	GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]remotefile.File, error)
+	DeleteAllTx(ctx context.Context, tx *sqlx.Tx, deletedFileIDs []remotefile.ID) error
+	CreateAllTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error
 }
 
 type genreRepository interface {
@@ -67,4 +68,5 @@ type artistRepository interface {
 }
 
 type songRepository interface {
+	CreateAllTx(ctx context.Context, tx *sqlx.Tx, songsToCreate []song.Song) error
 }

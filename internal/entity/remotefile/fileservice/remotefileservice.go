@@ -15,6 +15,10 @@ func GenerateID() ID {
 	return ID(uuid.New())
 }
 
+func (id ID) String() string {
+	return uuid.UUID(id).String()
+}
+
 type FileService struct {
 	ID        *ID
 	Address   string

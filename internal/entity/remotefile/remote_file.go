@@ -4,25 +4,36 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/puny-activity/music/internal/entity/remotefile/contenttype"
+	"github.com/puny-activity/music/pkg/werr"
 )
 
 type ID uuid.UUID
 
-func NewID(uuidID uuid.UUID) ID {
-	return ID(uuidID)
+func ParseID(id string) (ID, error) {
+	idUUID, err := uuid.Parse(id)
+	if err != nil {
+		return ID{}, werr.WrapSE("failed to parse uuid", err)
+	}
+	return ID(idUUID), nil
+}
+
+func (i ID) String() string {
+	return uuid.UUID(i).String()
 }
 
 type File struct {
 	ID   ID
 	Name string
+	Path string
 }
 
-type Changed struct {
-	Updated []Updated
-	Deleted []Deleted
+type Changes struct {
+	Created []FileInfo
+	Updated []FileInfo
+	Deleted []ID
 }
 
-type Updated struct {
+type FileInfo struct {
 	ID          ID
 	Name        string
 	ContentType contenttype.Type
@@ -32,11 +43,7 @@ type Updated struct {
 	MD5         string
 }
 
-type Deleted struct {
-	ID ID
-}
-
-func (e *Updated) GetAudioMetadata() *AudioMetadata {
+func (e *FileInfo) GetAudioMetadata() *AudioMetadata {
 	var m AudioMetadata
 	err := json.Unmarshal(e.Metadata, &m)
 	if err != nil {
@@ -45,7 +52,7 @@ func (e *Updated) GetAudioMetadata() *AudioMetadata {
 	return &m
 }
 
-func (e *Updated) GetImageMetadata() *ImageMetadata {
+func (e *FileInfo) GetImageMetadata() *ImageMetadata {
 	var m ImageMetadata
 	err := json.Unmarshal(e.Metadata, &m)
 	if err != nil {

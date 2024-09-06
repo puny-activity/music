@@ -7,23 +7,29 @@ option go_package = "/fileserviceproto";
 import "google/protobuf/timestamp.proto";
 
 service FileService {
-  rpc GetChanged (GetChangedRequest) returns (GetChangedResponse);
+  rpc GetChanges (GetChangesRequest) returns (GetChangesResponse);
 }
 
-message GetChangedRequest {
+message GetChangesRequest {
   google.protobuf.Timestamp since = 1;
 }
 
-message GetChangedResponse {
-  repeated string deletedFileIds = 1;
-  repeated File updatedFiles = 2;
-  message File {
-    string id = 1;
-    string name = 2;
-    string contentType = 3;
-    string path = 4;
-    int64 size = 5;
-    bytes metadata = 6;
-    string md5 = 7;
-  }
+message GetChangesResponse {
+  repeated FileInfo created_files = 1;
+  repeated FileInfo updated_files = 2;
+  repeated FileInfoId deleted_file_ids = 3;
+}
+
+message FileInfo {
+  FileInfoId id = 1;
+  string name = 2;
+  string content_type = 3;
+  string path = 4;
+  int64 size = 5;
+  bytes metadata = 6;
+  string md5 = 7;
+}
+
+message FileInfoId {
+  string id = 1;
 }

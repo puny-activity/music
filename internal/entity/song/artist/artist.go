@@ -7,7 +7,11 @@ import (
 
 type ID uuid.UUID
 
-var DefaultID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
+var DefaultID = ID(uuid.MustParse("00000000-0000-0000-0000-000000000000"))
+var DefaultArtist = Base{
+	ID:   &DefaultID,
+	Name: "???",
+}
 
 func NewID(uuidID uuid.UUID) ID {
 	return ID(uuidID)

@@ -29,7 +29,7 @@ CREATE TABLE covers
     id      UUID PRIMARY KEY,
     width   SMALLINT NOT NULL,
     height  SMALLINT NOT NULL,
-    file_id UUID     NOT NULL REFERENCES files (id) ON DELETE CASCADE
+    file_id UUID     NOT NULL REFERENCES files (id)
 );
 
 CREATE TABLE genres
@@ -65,7 +65,7 @@ CREATE INDEX idx_artists_name
 CREATE TABLE songs
 (
     id             UUID PRIMARY KEY,
-    file_id        UUID     NOT NULL REFERENCES files (id),
+    file_id        UUID REFERENCES files (id),
     title          TEXT     NOT NULL,
     duration_ns    BIGINT   NOT NULL,
     cover_id       UUID REFERENCES covers (id),

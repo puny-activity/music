@@ -3,7 +3,6 @@ package fileserviceclient
 import (
 	"context"
 	"github.com/golang-module/carbon"
-	"github.com/google/uuid"
 	"github.com/puny-activity/music/internal/entity/remotefile"
 	"github.com/puny-activity/music/internal/entity/remotefile/contenttype"
 	"github.com/puny-activity/music/pkg/proto/gen/fileserviceproto"
@@ -11,22 +10,21 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (c *Client) GetChangedFiles(ctx context.Context, since carbon.Carbon) (remotefile.Changed, error) {
-	clientResponse, err := c.client.GetChanged(ctx, &fileserviceproto.GetChangedRequest{
+func (c *Client) GetChangedFiles(ctx context.Context, since carbon.Carbon) (remotefile.Changes, error) {
+	clientResponse, err := c.client.GetChanges(ctx, &fileserviceproto.GetChangesRequest{
 		Since: timestamppb.New(since.ToStdTime()),
 	})
 	if err != nil {
-		return remotefile.Changed{}, werr.WrapSE("failed to fetch all files", err)
+		return remotefile.Changes{}, werr.WrapSE("failed to fetch all files", err)
 	}
 
-	updatedFiles := make([]remotefile.Updated, 0)
-	for _, file := range clientResponse.UpdatedFiles {
-		id, err := uuid.Parse(file.Id)
+	createdFiles := make([]remotefile.FileInfo, 0)
+	for _, file := range clientResponse.CreatedFiles {
+		id, err := remotefile.ParseID(file.Id.Id)
 		if err != nil {
 			c.log.Debug().Msg("failed to parse file id")
 			continue
 		}
-
 		contentType, err := contenttype.New(file.ContentType)
 		if err != nil {
 			c.log.Debug().Msg("failed to parse content type")
@@ -35,9 +33,8 @@ func (c *Client) GetChangedFiles(ctx context.Context, since carbon.Carbon) (remo
 		if !contentType.IsAudio() && !contentType.IsImage() {
 			continue
 		}
-
-		updatedFiles = append(updatedFiles, remotefile.Updated{
-			ID:          remotefile.NewID(id),
+		createdFiles = append(createdFiles, remotefile.FileInfo{
+			ID:          id,
 			Name:        file.Name,
 			ContentType: contentType,
 			Path:        file.Path,
@@ -47,18 +44,43 @@ func (c *Client) GetChangedFiles(ctx context.Context, since carbon.Carbon) (remo
 		})
 	}
 
-	deletedFiles := make([]remotefile.Deleted, 0)
-	for _, fileIDStr := range clientResponse.DeletedFileIds {
-		fileID, err := uuid.Parse(fileIDStr)
+	updatedFiles := make([]remotefile.FileInfo, 0)
+	for _, file := range clientResponse.UpdatedFiles {
+		id, err := remotefile.ParseID(file.Id.Id)
 		if err != nil {
+			c.log.Debug().Msg("failed to parse file id")
 			continue
 		}
-		deletedFiles = append(deletedFiles, remotefile.Deleted{
-			ID: remotefile.NewID(fileID),
+		contentType, err := contenttype.New(file.ContentType)
+		if err != nil {
+			c.log.Debug().Msg("failed to parse content type")
+			continue
+		}
+		if !contentType.IsAudio() && !contentType.IsImage() {
+			continue
+		}
+		updatedFiles = append(updatedFiles, remotefile.FileInfo{
+			ID:          id,
+			Name:        file.Name,
+			ContentType: contentType,
+			Path:        file.Path,
+			Size:        file.Size,
+			Metadata:    file.Metadata,
+			MD5:         file.Md5,
 		})
 	}
 
-	return remotefile.Changed{
+	deletedFiles := make([]remotefile.ID, 0)
+	for _, fileIDStr := range clientResponse.DeletedFileIds {
+		fileID, err := remotefile.ParseID(fileIDStr.Id)
+		if err != nil {
+			continue
+		}
+		deletedFiles = append(deletedFiles, fileID)
+	}
+
+	return remotefile.Changes{
+		Created: createdFiles,
 		Updated: updatedFiles,
 		Deleted: deletedFiles,
 	}, nil

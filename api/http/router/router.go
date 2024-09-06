@@ -31,6 +31,10 @@ func New(cfg *config.HTTP, router *chi.Mux, middleware *httpmiddleware.Middlewar
 
 func (r *Router) Setup() {
 	r.router.Group(func(router chi.Router) {
+		router.Route("/scan", func(router chi.Router) {
+			router.Post("/", r.wrapper.Wrap(r.controller.Scan))
+		})
+
 		router.Route("/genres", func(router chi.Router) {
 			router.Get("/", r.wrapper.Wrap(r.controller.GetGenres))
 		})
