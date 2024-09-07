@@ -9,9 +9,11 @@ import (
 	"github.com/puny-activity/music/internal/entity/song"
 	"github.com/puny-activity/music/internal/entity/song/album"
 	"github.com/puny-activity/music/internal/entity/song/artist"
+	"github.com/puny-activity/music/internal/entity/song/cover"
 	"github.com/puny-activity/music/internal/entity/song/genre"
 	"github.com/puny-activity/music/pkg/util"
 	"github.com/puny-activity/music/pkg/werr"
+	"strings"
 	"time"
 )
 
@@ -236,10 +238,20 @@ func (u *UseCase) createNewFiles(ctx context.Context, tx *sqlx.Tx, serviceInfo f
 
 	// TODO: Обрабатывать возможность перемещения файлов отслеживанием через md5
 
+	coversToCreate := make([]cover.Cover, 0)
 	songsToCreate := make([]song.Song, 0)
 	for _, createdFile := range created {
 		if createdFile.ContentType.IsImage() {
-			// TODO: Создать обложки
+			if !strings.HasPrefix(createdFile.Name, "cover") {
+				continue
+			}
+			metadata := createdFile.GetImageMetadata()
+			coversToCreate = append(coversToCreate, cover.Cover{
+				ID:     util.ToPointer(cover.GenerateID()),
+				Width:  metadata.Width,
+				Height: metadata.Height,
+				FileID: createdFile.ID,
+			})
 		} else if createdFile.ContentType.IsAudio() {
 			metadata := createdFile.GetAudioMetadata()
 			title := createdFile.Name
@@ -287,6 +299,10 @@ func (u *UseCase) createNewFiles(ctx context.Context, tx *sqlx.Tx, serviceInfo f
 		}
 	}
 
+	err = u.coverRepository.CreateAllTx(ctx, tx, coversToCreate)
+	if err != nil {
+		u.log.Warn().Err(err).Msg("failed to save covers")
+	}
 	err = u.songRepository.CreateAllTx(ctx, tx, songsToCreate)
 	if err != nil {
 		u.log.Warn().Err(err).Msg("failed to save songs")
@@ -296,6 +312,38 @@ func (u *UseCase) createNewFiles(ctx context.Context, tx *sqlx.Tx, serviceInfo f
 }
 
 func (u *UseCase) setNewCovers(ctx context.Context) error {
-	// TODO
+	fileServicesInfo, err := u.fileServiceRepository.GetAll(ctx)
+	if err != nil {
+		return werr.WrapSE("failed to get file services", err)
+	}
+
+	for _, fileServiceInfo := range fileServicesInfo {
+		err := u.txManager.Transaction(ctx, func(ctx context.Context, tx *sqlx.Tx) error {
+			allPaths, err := u.fileRepository.GetDistinctPathsTx(ctx, tx, *fileServiceInfo.ID)
+			if err != nil {
+				return werr.WrapSE("failed to get distinct paths", err)
+			}
+
+			for _, path := range allPaths {
+				coversByPath, err := u.coverRepository.GetAllByPathTx(ctx, tx, *fileServiceInfo.ID, path)
+				if err != nil {
+					return werr.WrapSE("failed to get covers by path", err)
+				}
+
+				if len(coversByPath) > 0 {
+					err = u.songRepository.SetCoverByPathTx(ctx, tx, path, *fileServiceInfo.ID, *coversByPath[0].ID)
+					if err != nil {
+						return werr.WrapSE("failed to set cover by path", err)
+					}
+				}
+			}
+
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/puny-activity/music/pkg/util"
 )
 
-type getAllEntity struct {
+type getAllDTO struct {
 	ID   uuid.UUID `db:"id"`
 	Name string    `db:"name"`
 }
@@ -29,7 +29,7 @@ SELECT a.id,
 FROM artists a
 `
 
-	artistsRepo := make([]getAllEntity, 0)
+	artistsRepo := make([]getAllDTO, 0)
 	err := queryer.SelectContext(ctx, &artistsRepo, query)
 	if err != nil {
 		return nil, err

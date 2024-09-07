@@ -7,6 +7,7 @@ import (
 	"github.com/puny-activity/music/internal/infrastructure/fileserviceclient"
 	"github.com/puny-activity/music/internal/infrastructure/repository/albumrepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/artistrepo"
+	"github.com/puny-activity/music/internal/infrastructure/repository/coverrepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/filerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/fileservicerepo"
 	"github.com/puny-activity/music/internal/infrastructure/repository/genrerepo"
@@ -51,12 +52,13 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	albumRepository := albumrepo.New(db.DB, txManager, log)
 	artistRepository := artistrepo.New(db.DB, txManager, log)
 	songRepository := songrepo.New(db.DB, txManager, log)
+	coverRepository := coverrepo.New(db.DB, txManager, log)
 
 	fileServiceClientsController := fileserviceclient.NewController(log)
 
 	fileServiceUseCase := fileserviceuc.New(fileServiceRepository, fileServiceClientsController, txManager, log)
 	updateSongUseCase := updatesonguc.New(fileServiceRepository, fileRepository, genreRepository, albumRepository, artistRepository,
-		songRepository, fileServiceClientsController, txManager, log)
+		songRepository, coverRepository, fileServiceClientsController, txManager, log)
 	genreUseCase := genreuc.New(genreRepository, txManager, log)
 	albumUseCase := albumuc.New(albumRepository, txManager, log)
 	artistUseCase := artistuc.New(artistRepository, txManager, log)

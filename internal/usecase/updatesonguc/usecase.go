@@ -8,6 +8,7 @@ import (
 	"github.com/puny-activity/music/internal/entity/song"
 	"github.com/puny-activity/music/internal/entity/song/album"
 	"github.com/puny-activity/music/internal/entity/song/artist"
+	"github.com/puny-activity/music/internal/entity/song/cover"
 	"github.com/puny-activity/music/internal/entity/song/genre"
 	"github.com/puny-activity/music/internal/infrastructure/fileserviceclient"
 	"github.com/puny-activity/music/pkg/txmanager"
@@ -21,6 +22,7 @@ type UseCase struct {
 	albumRepository       albumRepository
 	artistRepository      artistRepository
 	songRepository        songRepository
+	coverRepository       coverRepository
 	fileServiceController *fileserviceclient.Controller
 	txManager             txmanager.Transactor
 	log                   *zerolog.Logger
@@ -28,8 +30,8 @@ type UseCase struct {
 
 func New(fileServiceRepository fileServiceRepository, fileRepository fileRepository, genreRepository genreRepository,
 	albumRepository albumRepository, artistRepository artistRepository, songRepository songRepository,
-	fileServiceController *fileserviceclient.Controller, txManager txmanager.Transactor,
-	log *zerolog.Logger) *UseCase {
+	coverRepository coverRepository, fileServiceController *fileserviceclient.Controller,
+	txManager txmanager.Transactor, log *zerolog.Logger) *UseCase {
 	return &UseCase{
 		fileServiceRepository: fileServiceRepository,
 		fileRepository:        fileRepository,
@@ -37,6 +39,7 @@ func New(fileServiceRepository fileServiceRepository, fileRepository fileReposit
 		albumRepository:       albumRepository,
 		artistRepository:      artistRepository,
 		songRepository:        songRepository,
+		coverRepository:       coverRepository,
 		fileServiceController: fileServiceController,
 		txManager:             txManager,
 		log:                   log,
@@ -50,6 +53,7 @@ type fileServiceRepository interface {
 type fileRepository interface {
 	DeleteAllTx(ctx context.Context, tx *sqlx.Tx, deletedFileIDs []remotefile.ID) error
 	CreateAllTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error
+	GetDistinctPathsTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID) ([]string, error)
 }
 
 type genreRepository interface {
@@ -69,4 +73,10 @@ type artistRepository interface {
 
 type songRepository interface {
 	CreateAllTx(ctx context.Context, tx *sqlx.Tx, songsToCreate []song.Song) error
+	SetCoverByPathTx(ctx context.Context, tx *sqlx.Tx, path string, fileServiceInfo fileservice.ID, coverID cover.ID) error
+}
+
+type coverRepository interface {
+	GetAllByPathTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, path string) ([]cover.Cover, error)
+	CreateAllTx(ctx context.Context, tx *sqlx.Tx, coversToCreate []cover.Cover) error
 }

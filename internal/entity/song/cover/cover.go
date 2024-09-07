@@ -2,6 +2,7 @@ package cover
 
 import (
 	"github.com/google/uuid"
+	"github.com/puny-activity/music/internal/entity/remotefile"
 )
 
 type ID uuid.UUID
@@ -30,4 +31,5 @@ type Cover struct {
 	ID     *ID
 	Width  int
 	Height int
+	FileID remotefile.ID
 }

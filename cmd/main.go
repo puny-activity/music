@@ -67,6 +67,6 @@ func main() {
 	}
 	err = application.Close()
 	if err != nil {
-		panic(err)
+		log.Error().Err(err).Msg("failed to close application")
 	}
 }
