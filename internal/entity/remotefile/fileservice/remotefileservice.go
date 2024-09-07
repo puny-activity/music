@@ -3,12 +3,17 @@ package fileservice
 import (
 	"github.com/golang-module/carbon"
 	"github.com/google/uuid"
+	"github.com/puny-activity/music/pkg/werr"
 )
 
 type ID uuid.UUID
 
-func NewID(uuidID uuid.UUID) ID {
-	return ID(uuidID)
+func ParseID(id string) (ID, error) {
+	idUUID, err := uuid.Parse(id)
+	if err != nil {
+		return ID{}, werr.WrapSE("failed to parse uuid", err)
+	}
+	return ID(idUUID), nil
 }
 
 func GenerateID() ID {
@@ -20,7 +25,8 @@ func (id ID) String() string {
 }
 
 type FileService struct {
-	ID        *ID
-	Address   string
-	ScannedAt *carbon.Carbon
+	ID          *ID
+	HTTPAddress string
+	GRPCAddress string
+	ScannedAt   *carbon.Carbon
 }

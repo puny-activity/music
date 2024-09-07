@@ -74,6 +74,7 @@ type artistRepository interface {
 type songRepository interface {
 	CreateAllTx(ctx context.Context, tx *sqlx.Tx, songsToCreate []song.Song) error
 	SetCoverByPathTx(ctx context.Context, tx *sqlx.Tx, path string, fileServiceInfo fileservice.ID, coverID cover.ID) error
+	DeleteAllCoversTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID) error
 }
 
 type coverRepository interface {

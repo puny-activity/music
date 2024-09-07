@@ -20,7 +20,7 @@ func NewController(log *zerolog.Logger) *Controller {
 }
 
 func (c *Controller) Add(fileService fileservice.FileService) error {
-	newClient := New(fileService.Address, c.log)
+	newClient := New(fileService.GRPCAddress, c.log)
 	err := newClient.Start()
 	if err != nil {
 		return werr.WrapSE("failed to start client", err)

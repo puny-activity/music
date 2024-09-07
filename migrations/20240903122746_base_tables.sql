@@ -10,7 +10,8 @@ CREATE TABLE users
 CREATE TABLE file_services
 (
     id         UUID PRIMARY KEY,
-    address    TEXT NOT NULL,
+    http_address    TEXT NOT NULL,
+    grpc_address    TEXT NOT NULL,
     scanned_at TIMESTAMP
 );
 

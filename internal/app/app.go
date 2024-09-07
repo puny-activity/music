@@ -14,8 +14,10 @@ import (
 	"github.com/puny-activity/music/internal/infrastructure/repository/songrepo"
 	"github.com/puny-activity/music/internal/usecase/albumuc"
 	"github.com/puny-activity/music/internal/usecase/artistuc"
+	"github.com/puny-activity/music/internal/usecase/coveruc"
 	"github.com/puny-activity/music/internal/usecase/fileserviceuc"
 	"github.com/puny-activity/music/internal/usecase/genreuc"
+	"github.com/puny-activity/music/internal/usecase/songuc"
 	"github.com/puny-activity/music/internal/usecase/updatesonguc"
 	"github.com/puny-activity/music/pkg/postgres"
 	"github.com/puny-activity/music/pkg/txmanager"
@@ -26,6 +28,8 @@ import (
 type App struct {
 	FileServiceUseCase           *fileserviceuc.UseCase
 	UpdateSongUseCase            *updatesonguc.UseCase
+	SongUseCase                  *songuc.UseCase
+	CoverUseCase                 *coveruc.UseCase
 	GenreUseCase                 *genreuc.UseCase
 	AlbumUseCase                 *albumuc.UseCase
 	ArtistUseCase                *artistuc.UseCase
@@ -59,6 +63,8 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	fileServiceUseCase := fileserviceuc.New(fileServiceRepository, fileServiceClientsController, txManager, log)
 	updateSongUseCase := updatesonguc.New(fileServiceRepository, fileRepository, genreRepository, albumRepository, artistRepository,
 		songRepository, coverRepository, fileServiceClientsController, txManager, log)
+	songUseCase := songuc.New(songRepository, fileRepository, txManager, log)
+	coverUseCase := coveruc.New(coverRepository, fileRepository, txManager, log)
 	genreUseCase := genreuc.New(genreRepository, txManager, log)
 	albumUseCase := albumuc.New(albumRepository, txManager, log)
 	artistUseCase := artistuc.New(artistRepository, txManager, log)
@@ -71,6 +77,8 @@ func New(cfg config.App, log *zerolog.Logger) *App {
 	return &App{
 		FileServiceUseCase: fileServiceUseCase,
 		UpdateSongUseCase:  updateSongUseCase,
+		SongUseCase:        songUseCase,
+		CoverUseCase:       coverUseCase,
 		GenreUseCase:       genreUseCase,
 		AlbumUseCase:       albumUseCase,
 		ArtistUseCase:      artistUseCase,

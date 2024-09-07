@@ -35,6 +35,18 @@ func (r *Router) Setup() {
 			router.Post("/", r.wrapper.Wrap(r.controller.Scan))
 		})
 
+		router.Route("/songs", func(router chi.Router) {
+			router.Route("/{song_id}", func(router chi.Router) {
+				router.Get("/url", r.wrapper.Wrap(r.controller.GetSongsURL))
+			})
+		})
+
+		router.Route("/covers", func(router chi.Router) {
+			router.Route("/{cover_id}", func(router chi.Router) {
+				router.Get("/url", r.wrapper.Wrap(r.controller.GetCoversURL))
+			})
+		})
+
 		router.Route("/genres", func(router chi.Router) {
 			router.Get("/", r.wrapper.Wrap(r.controller.GetGenres))
 		})

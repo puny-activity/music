@@ -14,15 +14,15 @@ type createAllDTO struct {
 	FileID string `db:"file_id"`
 }
 
-func (r Repository) CreateAll(ctx context.Context, coversToCreate []cover.Cover) error {
+func (r *Repository) CreateAll(ctx context.Context, coversToCreate []cover.Cover) error {
 	return r.createAll(ctx, r.db, coversToCreate)
 }
 
-func (r Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, coversToCreate []cover.Cover) error {
+func (r *Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, coversToCreate []cover.Cover) error {
 	return r.createAll(ctx, tx, coversToCreate)
 }
 
-func (r Repository) createAll(ctx context.Context, queryer queryer.Queryer, coversToCreate []cover.Cover) error {
+func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, coversToCreate []cover.Cover) error {
 	if len(coversToCreate) == 0 {
 		return nil
 	}

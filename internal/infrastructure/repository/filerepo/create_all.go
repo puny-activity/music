@@ -15,15 +15,15 @@ type createAllDTO struct {
 	FileServiceID string `db:"file_service_id"`
 }
 
-func (r Repository) CreateAll(ctx context.Context, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error {
+func (r *Repository) CreateAll(ctx context.Context, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error {
 	return r.createAll(ctx, r.db, fileServiceID, filesToCreate)
 }
 
-func (r Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error {
+func (r *Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error {
 	return r.createAll(ctx, tx, fileServiceID, filesToCreate)
 }
 
-func (r Repository) createAll(ctx context.Context, queryer queryer.Queryer, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error {
+func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, fileServiceID fileservice.ID, filesToCreate []remotefile.File) error {
 	if len(filesToCreate) == 0 {
 		return nil
 	}

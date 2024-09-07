@@ -26,15 +26,15 @@ type createAllDTO struct {
 	MD5            string  `db:"md5"`
 }
 
-func (r Repository) CreateAll(ctx context.Context, songsToCreate []song.Song) error {
+func (r *Repository) CreateAll(ctx context.Context, songsToCreate []song.Song) error {
 	return r.createAll(ctx, r.db, songsToCreate)
 }
 
-func (r Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, songsToCreate []song.Song) error {
+func (r *Repository) CreateAllTx(ctx context.Context, tx *sqlx.Tx, songsToCreate []song.Song) error {
 	return r.createAll(ctx, tx, songsToCreate)
 }
 
-func (r Repository) createAll(ctx context.Context, queryer queryer.Queryer, songsToCreate []song.Song) error {
+func (r *Repository) createAll(ctx context.Context, queryer queryer.Queryer, songsToCreate []song.Song) error {
 	query := `
 INSERT INTO songs(id, file_id, title, duration_ns, cover_id, genre_id, album_id, artist_id, year, number, comment, channels, bitrate_kbps, sample_rate_hz, md5) 
 VALUES (:id, :file_id, :title, :duration_ns, :cover_id, :genre_id, :album_id, :artist_id, :year, :number, :comment, :channels, :bitrate_kbps, :sample_rate_hz, :md5)

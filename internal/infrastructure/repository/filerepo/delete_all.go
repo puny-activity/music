@@ -6,7 +6,7 @@ import (
 	"github.com/puny-activity/music/internal/entity/remotefile"
 )
 
-func (r Repository) DeleteAllTx(ctx context.Context, tx *sqlx.Tx, fileToDeleteIDs []remotefile.ID) error {
+func (r *Repository) DeleteAllTx(ctx context.Context, tx *sqlx.Tx, fileToDeleteIDs []remotefile.ID) error {
 	if len(fileToDeleteIDs) == 0 {
 		return nil
 	}

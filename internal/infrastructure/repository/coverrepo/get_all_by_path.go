@@ -18,15 +18,15 @@ type getAllDTO struct {
 	FileID string `db:"file_id"`
 }
 
-func (r Repository) GetAllByPath(ctx context.Context, fileServiceID fileservice.ID, path string) ([]cover.Cover, error) {
+func (r *Repository) GetAllByPath(ctx context.Context, fileServiceID fileservice.ID, path string) ([]cover.Cover, error) {
 	return r.getAllByPath(ctx, r.db, fileServiceID, path)
 }
 
-func (r Repository) GetAllByPathTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, path string) ([]cover.Cover, error) {
+func (r *Repository) GetAllByPathTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID, path string) ([]cover.Cover, error) {
 	return r.getAllByPath(ctx, tx, fileServiceID, path)
 }
 
-func (r Repository) getAllByPath(ctx context.Context, queryer queryer.Queryer, fileServiceID fileservice.ID, path string) ([]cover.Cover, error) {
+func (r *Repository) getAllByPath(ctx context.Context, queryer queryer.Queryer, fileServiceID fileservice.ID, path string) ([]cover.Cover, error) {
 	query := `
 SELECT c.id,
        c.width,

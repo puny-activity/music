@@ -44,6 +44,7 @@ func (u *UseCase) updateForOneFileService(ctx context.Context, serviceInfo files
 		return werr.WrapSE("failed to get file service client", err)
 	}
 
+	// TODO: Update since after scan
 	since := carbon.Parse("0001-01-01")
 	if serviceInfo.ScannedAt != nil {
 		since = *serviceInfo.ScannedAt
@@ -68,6 +69,8 @@ func (u *UseCase) updateForOneFileService(ctx context.Context, serviceInfo files
 		if err != nil {
 			u.log.Warn().Err(err).Msg("failed to delete files")
 		}
+
+		// TODO: Update files
 
 		return nil
 	})
@@ -322,6 +325,11 @@ func (u *UseCase) setNewCovers(ctx context.Context) error {
 			allPaths, err := u.fileRepository.GetDistinctPathsTx(ctx, tx, *fileServiceInfo.ID)
 			if err != nil {
 				return werr.WrapSE("failed to get distinct paths", err)
+			}
+
+			err = u.songRepository.DeleteAllCoversTx(ctx, tx, *fileServiceInfo.ID)
+			if err != nil {
+				return werr.WrapSE("failed to delete covers", err)
 			}
 
 			for _, path := range allPaths {

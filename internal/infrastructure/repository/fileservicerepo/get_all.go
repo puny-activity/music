@@ -3,7 +3,6 @@ package fileservicerepo
 import (
 	"context"
 	"github.com/golang-module/carbon"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/puny-activity/music/internal/entity/remotefile/fileservice"
 	"github.com/puny-activity/music/pkg/queryer"
@@ -12,9 +11,10 @@ import (
 )
 
 type getAllEntity struct {
-	ID        uuid.UUID `db:"id"`
-	Address   string    `db:"address"`
-	ScannedAt *string   `db:"scanned_at"`
+	ID          string  `db:"id"`
+	HTTPAddress string  `db:"http_address"`
+	GRPCAddress string  `db:"grpc_address"`
+	ScannedAt   *string `db:"scanned_at"`
 }
 
 func (r *Repository) GetAll(ctx context.Context) ([]fileservice.FileService, error) {
@@ -28,7 +28,8 @@ func (r *Repository) GetAllTx(ctx context.Context, tx *sqlx.Tx) ([]fileservice.F
 func (r *Repository) getAll(ctx context.Context, queryer queryer.Queryer) ([]fileservice.FileService, error) {
 	query := `
 SELECT fs.id,
-       fs.address,
+       fs.http_address,
+       fs.grpc_address,
        fs.scanned_at
 FROM file_services fs
 `
@@ -49,10 +50,15 @@ FROM file_services fs
 			}
 		}
 
+		fileServiceID, err := fileservice.ParseID(fileServicesRepo[i].ID)
+		if err != nil {
+			return nil, werr.WrapSE("failed to parse file service id", err)
+		}
+
 		fileServices[i] = fileservice.FileService{
-			ID:        util.ToPointer(fileservice.NewID(fileServicesRepo[i].ID)),
-			Address:   fileServicesRepo[i].Address,
-			ScannedAt: scannedAt,
+			ID:          &fileServiceID,
+			GRPCAddress: fileServicesRepo[i].GRPCAddress,
+			ScannedAt:   scannedAt,
 		}
 	}
 

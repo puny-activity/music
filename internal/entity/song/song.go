@@ -7,13 +7,18 @@ import (
 	"github.com/puny-activity/music/internal/entity/song/artist"
 	"github.com/puny-activity/music/internal/entity/song/cover"
 	"github.com/puny-activity/music/internal/entity/song/genre"
+	"github.com/puny-activity/music/pkg/werr"
 	"time"
 )
 
 type ID uuid.UUID
 
-func NewID(uuidID uuid.UUID) ID {
-	return ID(uuidID)
+func ParseID(id string) (ID, error) {
+	idUUID, err := uuid.Parse(id)
+	if err != nil {
+		return ID{}, werr.WrapSE("failed to parse uuid", err)
+	}
+	return ID(idUUID), nil
 }
 
 func GenerateID() ID {

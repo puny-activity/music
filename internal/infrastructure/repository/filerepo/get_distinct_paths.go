@@ -7,15 +7,15 @@ import (
 	"github.com/puny-activity/music/pkg/queryer"
 )
 
-func (r Repository) GetDistinctPaths(ctx context.Context, fileServiceID fileservice.ID) ([]string, error) {
+func (r *Repository) GetDistinctPaths(ctx context.Context, fileServiceID fileservice.ID) ([]string, error) {
 	return r.getDistinctPaths(ctx, r.db, fileServiceID)
 }
 
-func (r Repository) GetDistinctPathsTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID) ([]string, error) {
+func (r *Repository) GetDistinctPathsTx(ctx context.Context, tx *sqlx.Tx, fileServiceID fileservice.ID) ([]string, error) {
 	return r.getDistinctPaths(ctx, tx, fileServiceID)
 }
 
-func (r Repository) getDistinctPaths(ctx context.Context, queryer queryer.Queryer, fileServiceID fileservice.ID) ([]string, error) {
+func (r *Repository) getDistinctPaths(ctx context.Context, queryer queryer.Queryer, fileServiceID fileservice.ID) ([]string, error) {
 	query := `
 SELECT DISTINCT f.path
 FROM files f

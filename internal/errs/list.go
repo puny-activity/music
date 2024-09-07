@@ -11,6 +11,8 @@ var (
 	InvalidCursorParameter    = fmt.Errorf("invalid cursor parameter")
 	SortAndCursorSpecified    = fmt.Errorf("sort and cursor specified")
 	UnknownSortParameter      = fmt.Errorf("unknown sort parameter")
+	InvalidSongParameter      = fmt.Errorf("invalid song parameter")
+	InvalidCoverParameter     = fmt.Errorf("invalid cover parameter")
 
 	Unexpected = fmt.Errorf("unexpected error")
 )
@@ -54,5 +56,13 @@ var errorList = []internalError{
 	{
 		error: UnknownSortParameter,
 		code:  "R-8",
+	},
+	{
+		error: InvalidSongParameter,
+		code:  "R-9",
+	},
+	{
+		error: InvalidCoverParameter,
+		code:  "R-10",
 	},
 }
