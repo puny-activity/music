@@ -107,9 +107,6 @@ func (r *Repository) GetManyTx(ctx context.Context, tx *sqlx.Tx, pgn pagination.
 }
 
 func (r *Repository) getMany(ctx context.Context, queryer queryer.Queryer, pgn pagination.CursorPagination) ([]genre.Genre, pagination.CursorPair, error) {
-	if pgn.Limit < 1 {
-		return nil, pagination.CursorPair{}, errs.InvalidLimitParameter
-	}
 	if pgn.Cursor == nil {
 		var err error
 		pgn.Parameters, err = getManyPgnParameterConvert(pgn.Parameters)

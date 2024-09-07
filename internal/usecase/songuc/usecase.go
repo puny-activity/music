@@ -6,6 +6,8 @@ import (
 	"github.com/puny-activity/music/internal/entity/remotefile"
 	"github.com/puny-activity/music/internal/entity/remotefile/fileservice"
 	"github.com/puny-activity/music/internal/entity/song"
+	"github.com/puny-activity/music/pkg/filters"
+	"github.com/puny-activity/music/pkg/pagination"
 	"github.com/puny-activity/music/pkg/txmanager"
 	"github.com/rs/zerolog"
 )
@@ -29,6 +31,7 @@ func New(songRepository songRepository, fileRepository fileRepository, txManager
 
 type songRepository interface {
 	GetFileTx(ctx context.Context, tx *sqlx.Tx, songID song.ID) (remotefile.File, error)
+	GetMany(ctx context.Context, search string, fltr filters.Filter, pgn pagination.CursorPagination) ([]song.Song, pagination.CursorPair, error)
 }
 
 type fileRepository interface {

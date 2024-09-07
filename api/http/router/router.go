@@ -36,6 +36,7 @@ func (r *Router) Setup() {
 		})
 
 		router.Route("/songs", func(router chi.Router) {
+			router.Get("/", r.wrapper.Wrap(r.controller.GetSongs))
 			router.Route("/{song_id}", func(router chi.Router) {
 				router.Get("/url", r.wrapper.Wrap(r.controller.GetSongsURL))
 			})

@@ -46,3 +46,18 @@ type Song struct {
 	SampleRateHz int
 	MD5          string
 }
+
+const (
+	PaginationNumber     = "song_number"
+	PaginationTitle      = "song_title"
+	PaginationYear       = "song_year"
+	PaginationDuration   = "song_duration"
+	PaginationBitrate    = "song_bitrate"
+	PaginationSampleRate = "song_sample_rate"
+)
+
+const (
+	FilterGenre  = "song_genre_filter"
+	FilterAlbum  = "song_album_filter"
+	FilterArtist = "song_artist_filter"
+)

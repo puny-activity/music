@@ -13,6 +13,9 @@ var (
 	UnknownSortParameter      = fmt.Errorf("unknown sort parameter")
 	InvalidSongParameter      = fmt.Errorf("invalid song parameter")
 	InvalidCoverParameter     = fmt.Errorf("invalid cover parameter")
+	InvalidGenreParameter     = fmt.Errorf("invalid genre parameter")
+	InvalidAlbumParameter     = fmt.Errorf("invalid album parameter")
+	InvalidArtistParameter    = fmt.Errorf("invalid artist parameter")
 
 	Unexpected = fmt.Errorf("unexpected error")
 )
@@ -64,5 +67,17 @@ var errorList = []internalError{
 	{
 		error: InvalidCoverParameter,
 		code:  "R-10",
+	},
+	{
+		error: InvalidGenreParameter,
+		code:  "R-11",
+	},
+	{
+		error: InvalidAlbumParameter,
+		code:  "R-12",
+	},
+	{
+		error: InvalidArtistParameter,
+		code:  "R-13",
 	},
 }
